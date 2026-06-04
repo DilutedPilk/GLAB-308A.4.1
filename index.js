@@ -23,15 +23,30 @@ const getFavouritesBtn = document.getElementById("getFavouritesBtn");
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
-async function initialLoad(){
-  const response = await fetch("https://api.thecatapi.com/v1/breeds",{
-    headers: { API_KEY }
-  })
-  const jsonData = await response.json();
-
-  console.log(jsonData)
+async function initialLoad() {
+  
+  try{
+    const response = await fetch("https://api.thecatapi.com/v1/breeds",
+    {
+    headers:{
+      "x-api-key":API_KEY,
+  },
+ }
+);
+  const  breeds=await response.json();
+    breeds.forEach((breed)=> {
+    const option = document.createElement("option");
+    option.value = breed.id;
+    option.textContent = breed.name;
+    breedSelect.appendChild(option);
+  });
 }
-initialLoad()
+catch(error)
+{
+  console.error("unable to fetch breeds:",error);
+}
+}
+initialLoad();
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
