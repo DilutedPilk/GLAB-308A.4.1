@@ -1,9 +1,7 @@
 import * as Carousel from "./Carousel.js";
 import { API_KEY } from "./keys.js";
 
-
 // import axios from "axios";
-
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
 // The information section div element.
@@ -12,9 +10,7 @@ const infoDump = document.getElementById("infoDump");
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
-
 // Step 0: Store your API key in the keys.js file.
-
 /**
  * 1. Create an async function "initialLoad" that does the following:
  * - Retrieve a list of breeds from the cat API using fetch().
@@ -22,32 +18,31 @@ const getFavouritesBtn = document.getElementById("getFavouritesBtn");
  *  - Each option should have a value attribute equal to the id of the breed.
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
+ * 
  */
 async function initialLoad() {
-  
-  try{
+  try {
     const response = await fetch("https://api.thecatapi.com/v1/breeds",
-    {
-    headers:{
-      "x-api-key":API_KEY,
-  },
- }
-);
-  const  breeds=await response.json();
-    breeds.forEach((breed)=> {
-    const option = document.createElement("option");
-    option.value = breed.id;
-    option.textContent = breed.name;
-    breedSelect.appendChild(option);
-  });
-}
-catch(error)
-{
-  console.error("unable to fetch breeds:",error);
-}
+      {
+        headers: {
+          "x-api-key": API_KEY,
+        },
+      }
+    );
+    const breeds = await response.json();
+    breeds.forEach((breed) => {
+      const option = document.createElement("option");
+      option.value = breed.id;
+      option.textContent = breed.name;
+      breedSelect.appendChild(option);
+    });
+    //await getBreed(breeds[0].id);
+  }
+  catch (error) {
+    console.error("unable to fetch breeds:", error);
+  }
 }
 initialLoad();
-
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
@@ -62,61 +57,82 @@ initialLoad();
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
-
-/**
- * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
- */
-/**
- * 4. Change all of your fetch() functions to axios!
- * - axios has already been imported for you within index.js.
- * - If you've done everything correctly up to this point, this should be simple.
- * - If it is not simple, take a moment to re-evaluate your original code.
- * - Hint: Axios has the ability to set default headers. Use this to your advantage
- *   by setting a default header with your API key so that you do not have to
- *   send it manually with all of your requests! You can also set a default base URL!
- */
-/**
- * 5. Add axios interceptors to log the time between request and response to the console.
- * - Hint: you already have access to code that does this!
- * - Add a console.log statement to indicate when requests begin.
- * - As an added challenge, try to do this on your own without referencing the lesson material.
- */
-
-/**
- * 6. Next, we'll create a progress bar to indicate the request is in progress.
- * - The progressBar element has already been created for you.
- *  - You need only to modify its "width" style property to align with the request progress.
- * - In your request interceptor, set the width of the progressBar element to 0%.
- *  - This is to reset the progress with each request.
- * - Research the axios onDownloadProgress config option.
- * - Create a function "updateProgress" that receives a ProgressEvent object.
- *  - Pass this function to the axios onDownloadProgress config option in your event handler.
- * - console.log your ProgressEvent object within updateProgess, and familiarize yourself with its structure.
- *  - Update the progress of the request using the properties you are given.
- * - Note that we are not downloading a lot of data, so onDownloadProgress will likely only fire
- *   once or twice per request to this API. This is still a concept worth familiarizing yourself
- *   with for future projects.
- */
-
-/**
- * 7. As a final element of progress indication, add the following to your axios interceptors:
- * - In your request interceptor, set the body element's cursor style to "progress."
- * - In your response interceptor, remove the progress cursor style from the body element.
- */
-/**
- * 8. To practice posting data, we'll create a system to "favourite" certain images.
- * - The skeleton of this function has already been created for you.
- * - This function is used within Carousel.js to add the event listener as items are created.
- *  - This is why we use the export keyword for this function.
- * - Post to the cat API's favourites endpoint with the given ID.
- * - The API documentation gives examples of this functionality using fetch(); use Axios!
- * - Add additional logic to this function such that if the image is already favourited,
- *   you delete that favourite using the API, giving this function "toggle" functionality.
- * - You can call this function by clicking on the heart at the top right of any image.
- */
-export async function favourite(imgId) {
-  // your code here
+//Event-handler  for breedSelect
+async function fetchBreed(e) {
+  let breedId = e.target.value;
+  let request = await fetch(`https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${breedId}&api_key=${API_KEY}`)
+  const data = await request.json();
+  return data;
 }
+
+breedSelect.addEventListener("change", async (e) => {
+  Carousel.clear();
+  Carousel.start();
+  const breed = await fetchBreed(e);
+  console.log(breed)
+  breed.forEach((element) => {
+    const breedItem = Carousel.createCarouselItem(
+      element.url,
+      breed[0].alt_names,
+      element.id,
+    );
+    Carousel.appendCarousel(breedItem);
+  });
+});
+  /**
+   * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
+   */
+  /**
+   * 4. Change all of your fetch() functions to axios!
+   * - axios has already been imported for you within index.js.
+   * - If you've done everything correctly up to this point, this should be simple.
+   * - If it is not simple, take a moment to re-evaluate your original code.
+   * - Hint: Axios has the ability to set default headers. Use this to your advantage
+   *   by setting a default header with your API key so that you do not have to
+   *   send it manually with all of your requests! You can also set a default base URL!
+   */
+  /**
+   * 5. Add axios interceptors to log the time between request and response to the console.
+   * - Hint: you already have access to code that does this!
+   * - Add a console.log statement to indicate when requests begin.
+   * - As an added challenge, try to do this on your own without referencing the lesson material.
+   */
+
+  /**
+   * 6. Next, we'll create a progress bar to indicate the request is in progress.
+   * - The progressBar element has already been created for you.
+   *  - You need only to modify its "width" style property to align with the request progress.
+   * - In your request interceptor, set the width of the progressBar element to 0%.
+   *  - This is to reset the progress with each request.
+   * - Research the axios onDownloadProgress config option.
+   * - Create a function "updateProgress" that receives a ProgressEvent object.
+   *  - Pass this function to the axios onDownloadProgress config option in your event handler.
+   * - console.log your ProgressEvent object within updateProgess, and familiarize yourself with its structure.
+   *  - Update the progress of the request using the properties you are given.
+   * - Note that we are not downloading a lot of data, so onDownloadProgress will likely only fire
+   *   once or twice per request to this API. This is still a concept worth familiarizing yourself
+   *   with for future projects.
+   */
+
+  /**
+   * 7. As a final element of progress indication, add the following to your axios interceptors:
+   * - In your request interceptor, set the body element's cursor style to "progress."
+   * - In your response interceptor, remove the progress cursor style from the body element.
+   */
+  /**
+   * 8. To practice posting data, we'll create a system to "favourite" certain images.
+   * - The skeleton of this function has already been created for you.
+   * - This function is used within Carousel.js to add the event listener as items are created.
+   *  - This is why we use the export keyword for this function.
+   * - Post to the cat API's favourites endpoint with the given ID.
+   * - The API documentation gives examples of this functionality using fetch(); use Axios!
+   * - Add additional logic to this function such that if the image is already favourited,
+   *   you delete that favourite using the API, giving this function "toggle" functionality.
+   * - You can call this function by clicking on the heart at the top right of any image.
+   */
+  export async function favourite(imgId) {
+    // your code here
+  }
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
