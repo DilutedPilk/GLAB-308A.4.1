@@ -67,7 +67,6 @@ async function fetchBreed(e) {
 
 breedSelect.addEventListener("change", async (e) => {
   Carousel.clear();
-  Carousel.start();
   const breed = await fetchBreed(e);
   console.log(breed)
   breed.forEach((element) => {
@@ -78,6 +77,7 @@ breedSelect.addEventListener("change", async (e) => {
     );
     Carousel.appendCarousel(breedItem);
   });
+  Carousel.start();
 });
   /**
    * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
