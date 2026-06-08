@@ -124,7 +124,7 @@ function updateProgess(e) {
         }, 1500);
       } else {
         let percent = Math.floor((progressEvent.loaded / progressEvent.total) * 100)
-        progressBar.style.width = percent+"%"
+        progressBar.style.width = `${percent}%`
       }
     }
   }
@@ -149,7 +149,14 @@ function updateProgess(e) {
  */
 export async function favourite(imgId) {
   // your code here
-}
+  const fave = await axios.get(`https://api.thecatapi.com/v1/favourites?${imgId}`, { headers: { "x-api-key": API_KEY, },});
+  const faveArr = fave.data;
+  if (faveArr.length){
+    await axios.delete(`https://api.thecatapi.com/v1/favourites?${faveArr[0].id}`, { headers: { 'x-api-key': API_KEY },});
+  } else {
+    await axios.post(`https://api.thecatapi.com/v1/favourites?${faveArr[0].id}`, { image : imgId }, { headers: { 'x-api-key': API_KEY },});
+  }
+};
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
@@ -160,6 +167,22 @@ export async function favourite(imgId) {
  *    If that isn't in its own function, maybe it should be so you don't have to
  *    repeat yourself in this section.
  */
+
+const faveButton = document.querySelector('#getFavouritesBtn');
+
+faveButton.addEventListener('click', async (e) =>{
+  const favorites = await axios.post(`https://api.thecatapi.com/v1/favourites/`, { headers: { 'x-api-key': API_KEY },});
+  Carousel.clear();
+  const data = favorites.data;
+  data.forEach((element) => {
+    const faveItem = Carousel.createCarouselItem(
+      element.url,
+      element.id,
+    );
+    Carousel.appendCarousel(faveItem);
+  });
+  Carousel.start();
+});
 
 /**
  * 10. Test your site, thoroughly!
